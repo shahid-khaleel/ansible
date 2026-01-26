@@ -1,0 +1,18 @@
+# ansible-role-amazon-corretto/tasks/main.yml
+---
+- name: Gather package facts
+  ansible.builtin.package_facts:
+
+- name: Set the package name based on the corretto_version
+  set_fact:
+    corretto_package_name: "amazon-corretto-{{ correto_version }}"
+
+- name: Download Amazon Corretto JDK .deb package
+  ansible.builtin.get_url:
+    url: "{{ corretto_package_url }}"  # The URL now includes corretto_version and corretto_arch
+    dest: "{{ corretto_package_dest }}"
+  when: java_role_enabled and corretto_package_name not in ansible_facts.packages
+
+- name: Install Amazon Corretto JDK .deb package
+  command: dpkg -i "{{ corretto_package_dest }}"
+  when: java_role_enabled and corretto_package_name not in ansible_facts.packages

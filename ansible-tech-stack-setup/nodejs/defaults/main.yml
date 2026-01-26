@@ -1,0 +1,5 @@
+# install_nodejs/defaults/main.yml
+---
+install_nodejs_enabled: false  # Default to false, set to true to enable the role
+node_version: "23"
+nvm_version: "v0.40.1"

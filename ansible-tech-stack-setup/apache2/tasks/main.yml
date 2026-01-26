@@ -1,0 +1,17 @@
+# tasks file for apache2
+---
+- name: Installation of apache2
+  ansible.builtin.apt:
+    name: apache2
+    update_cache: yes
+    state: latest
+  when: install_apache | default(true)
+  notify: restart apache2 
+
+- name: Ensure apache2 service is started
+  ansible.builtin.systemd:
+    name: apache2
+    state: restarted
+    enabled: yes
+  when: install_apache | default(true)
+  notify: restart apache2  # Ensure that Apache is started and notify handler if it changes

@@ -1,0 +1,2 @@
+[appServers]
+192.168.0.102 ansible_ssh_user=test ansible_ssh_pass=test ansible_become_pass=test

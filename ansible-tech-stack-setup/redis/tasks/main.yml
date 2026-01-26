@@ -1,0 +1,159 @@
+---
+# ansible-role-redis-tls/tasks/main.yml
+- name: Create Redis Group
+  ansible.builtin.group:
+    name: redis
+    state: present
+
+- name: Add Redis System User
+  ansible.builtin.user:
+    name: redis
+    system: yes
+    group: redis
+    create_home: no
+  when: redis_role_enabled
+
+- name: Download Redis Tarball
+  ansible.builtin.get_url:
+    url: "{{ redis_url_cli }}"
+    dest: "{{ redis_tarball_dest }}"
+  #when: redis_url_cli is defined
+  when: false
+
+- name: Extract Redis Tarball
+  ansible.builtin.unarchive:
+    src: "{{ redis_tarball_dest }}"
+    dest: /tmp/
+    remote_src: yes
+  #when: redis_tarball_dest is defined
+  when: false
+
+- name: Change directory to Redis Source and Compile with TLS support
+  ansible.builtin.shell: |
+    make MALLOC=libc BUILD_TLS=yes
+    cp /tmp/redis-stable/src/redis-cli /usr/bin/redis-cli
+  args:
+    chdir: "{{ redis_source_dir }}"
+  #when: redis_source_dir is defined
+  when: false
+
+- name: Clean up the tarball and extracted files
+  ansible.builtin.file:
+    path: "{{ redis_tarball_dest }}"
+    state: absent
+  #when: redis_tarball_dest is defined
+  when: false
+
+- name: Clean up the extracted Redis directory
+  ansible.builtin.file:
+    path: "{{ redis_extract_dest_cli }}"
+    state: absent
+  #when: redis_extract_dest_cli is defined
+  when: false
+
+##############Redis-Server###################################
+
+- name: Create Redis Data Directory
+  ansible.builtin.file:
+    path: "{{ redis_config_dir.config_path }}"
+    state: directory
+    mode: '0770'
+    owner: "{{ redis_user }}"
+    group: "{{ redis_group }}"
+  when: redis_role_enabled
+  
+- name: Download redis
+  ansible.builtin.get_url:
+    url: "{{ redis_url }}"
+    dest: "{{ redis_download_dest }}"
+  when: redis_role_enabled  # Only run if the role is enabled
+
+- name: Extract Redis tarball
+  ansible.builtin.unarchive:
+    src: "{{ redis_download_dest }}"
+    dest: "/tmp/"
+    remote_src: yes
+    creates: "{{ redis_extract_dest }}"  # Avoid extraction if already done
+  when: redis_role_enabled
+
+- name: Download stable Redis version
+  ansible.builtin.get_url:
+    url: "https://download.redis.io/releases/redis-{{ redis_version }}.tar.gz"
+    dest: "/tmp/redis-{{ redis_version }}.tar.gz"
+  when: redis_role_enabled
+
+- name: Extract Redis server tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/redis-{{ redis_version }}.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+    creates: "/tmp/redis-{{ redis_version }}"
+  when: redis_role_enabled
+
+- name: Compile Redis server
+  ansible.builtin.shell: |
+    make
+    make install
+  args:
+    chdir: "/tmp/redis-{{ redis_version }}"
+  when: redis_role_enabled
+
+- name: Copy the redis-server binary and redis.conf
+  ansible.builtin.shell: |
+    cp /tmp/redis-{{ redis_version }}/src/redis-server /usr/bin/
+  args:
+    chdir: "/tmp/redis-{{ redis_version }}"
+  when: redis_role_enabled
+
+- name: Copy the Redis config file from the source to /etc/redis/
+  ansible.builtin.copy:
+    src: "{{ redis_config_file }}"  # Ensure the correct path to the config file
+    dest: "/etc/redis/redis.conf"
+    mode: "0644"
+  when: redis_role_enabled
+
+- name: Copy the service file to systemd directory
+  ansible.builtin.copy:
+    src: "{{ redis_service_file }}"
+    dest: "/etc/systemd/system/"
+    mode: "0644"
+  when: redis_role_enabled
+
+- name: Add Redis System User and Group
+  ansible.builtin.user:
+    name: "{{ redis_user }}"
+    group: "{{ redis_group }}"
+    system: yes
+    create_home: no
+  when: redis_role_enabled
+
+- name: Create Redis Data Directory
+  ansible.builtin.file:
+    path: "{{ redis_install_dir }}"
+    state: directory
+    mode: '0770'
+    owner: "{{ redis_user }}"
+    group: "{{ redis_group }}"
+  when: redis_role_enabled
+
+
+
+- name: Reload systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  when: redis_role_enabled
+
+- name: Start Redis service (if enabled)
+  ansible.builtin.systemd:
+    name: redis
+    state: "{{ 'started' if redis_service_started else 'stopped' }}"
+    enabled: "{{ redis_service_enabled }}"
+  when: redis_role_enabled
+
+- name: Start Redis service (if enabled)
+  ansible.builtin.systemd:
+    name: redis
+    state: restarted
+  when: redis_role_enabled
+  notify: Restart Redis Service
+

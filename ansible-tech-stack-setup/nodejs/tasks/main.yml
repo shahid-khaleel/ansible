@@ -1,0 +1,24 @@
+# install_nodejs/tasks/main.yml
+---
+- name: Install NVM, Node.js, and verify versions
+  ansible.builtin.shell: |
+    # Install NVM
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+    # Source NVM script to make it available in the session
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    # Install Node.js version 23
+    nvm install {{ node_version }}
+    # Verify Node.js version
+    node -v
+    # Verify npm version
+    npm -v
+  environment:
+    HOME: "{{ ansible_env.HOME }}"
+  register: result
+  when: install_nodejs_enabled  # Only run if the role is enabled
+
+- name: Output the Node.js and npm versions
+  debug:
+    msg: "Node.js version: {{ result.stdout_lines[0] }}, npm version: {{ result.stdout_lines[1] }}"
+  when: install_nodejs_enabled  # Only run if the role is enabled

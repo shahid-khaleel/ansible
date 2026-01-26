@@ -1,0 +1,24 @@
+---
+- hosts: [appServers]  # This will target all hosts defined in your inventory (hosts file)
+  gather_facts: true  # We don't need to gather facts for a simple ping
+  become: true
+  roles:
+    - apache2
+    - dependencies-packages
+    - java
+    - redis
+    - nodejs
+    - mysql-shell
+    - mongodb-shell
+  vars:
+    correto_version: "21"
+    redis_version: "7.4.1"
+    install_apache: true
+    install_deps_packages: true
+    java_role_enabled: true
+    redis_service_enabled: true
+    redis_service_started: true
+    redis_role_enabled: true
+    install_nodejs_enabled: true
+    
+  

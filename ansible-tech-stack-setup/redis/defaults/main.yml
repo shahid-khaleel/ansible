@@ -1,0 +1,23 @@
+# ansible-role-redis/defaults/main.yml
+---
+redis_role_enabled: false
+redis_version: "7.4.1"
+redis_url: "https://download.redis.io/releases/redis-{{ redis_version }}.tar.gz"
+redis_download_dest: "/tmp/redis-{{ redis_version }}.tar.gz"
+redis_extract_dest: "/tmp/redis-{{ redis_version }}"
+redis_service_file: "redis-service-file/redis.service"
+redis_user: "redis"
+redis_group: "redis"
+redis_install_dir: "/app/lib/redis"
+redis_config_file: "redis-service-file/redis.conf"
+redis_config_dir:
+  config_path: "/etc/redis"
+redis_service_enabled: true
+redis_service_started: true
+
+redis_url_cli: "http://download.redis.io/redis-stable.tar.gz"
+redis_tarball_dest: "/tmp/redis-stable.tar.gz"
+redis_extract_dest_cli: "/tmp/redis-stable"
+redis_cli_dest: "/usr/bin/redis-cli"
+redis_source_dir: "/tmp/redis-stable/src"
+redis_version_cli: "stable"

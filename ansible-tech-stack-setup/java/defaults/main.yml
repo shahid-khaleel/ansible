@@ -1,0 +1,7 @@
+# ansible-role-amazon-corretto/defaults/main.yml
+---
+corretto_version: "21"  # Default version of Amazon Corretto
+correto_arch: "x64"    # Default architecture, can be "x64" or "aarch64"
+corretto_package_url: "https://corretto.aws/downloads/latest/amazon-corretto-{{ corretto_version }}-{{ correto_arch }}-linux-jdk.deb"
+corretto_package_dest: "/tmp/amazon-corretto-{{ corretto_version }}-{{ correto_arch }}-linux-jdk.deb"
+java_role_enabled: true  # Default to true to disable the role

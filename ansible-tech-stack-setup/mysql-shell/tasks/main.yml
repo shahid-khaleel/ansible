@@ -1,0 +1,13 @@
+# ansible-role-mysql-shell/tasks/main.yml
+
+---
+- name: Download MySQL Shell .deb package using wget
+  ansible.builtin.command:
+    cmd: "wget -qO {{ mysql_shell_deb }} {{ mysql_shell_url }}"
+  when: mysql_shell_url is defined
+
+- name: Install MySQL Shell .deb package
+  ansible.builtin.command:
+    cmd: "dpkg -i {{ mysql_shell_deb }}"
+  when: mysql_shell_deb is defined
+

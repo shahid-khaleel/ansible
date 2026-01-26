@@ -1,0 +1,6 @@
+# ansible-role-mongodb/defaults/main.yml
+
+mongodb_version: "8.0"
+mongodb_repo: "https://repo.mongodb.org/apt/ubuntu"
+mongodb_gpg_url: "https://www.mongodb.org/static/pgp/server-{{ mongodb_version }}.asc"
+mongodb_source_list: "/etc/apt/sources.list.d/mongodb-org-{{ mongodb_version }}.list"

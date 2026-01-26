@@ -1,0 +1,21 @@
+# ansible-role-mongodb/tasks/main.yml
+
+---
+- name: Add MongoDB GPG key
+  ansible.builtin.shell: |
+    wget -qO- {{ mongodb_gpg_url }} | sudo tee /etc/apt/trusted.gpg.d/server-{{ mongodb_version }}.asc
+  when: mongodb_gpg_url is defined
+
+- name: Add MongoDB repository to APT sources
+  ansible.builtin.shell: |
+    echo "deb [ arch=amd64,arm64 ] {{ mongodb_repo }} noble/mongodb-org/{{ mongodb_version }} multiverse" | sudo tee {{ mongodb_source_list }}
+  when: mongodb_repo is defined
+
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install MongoDB Mongosh
+  ansible.builtin.apt:
+    name: mongodb-mongosh
+    state: present

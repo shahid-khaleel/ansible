@@ -1,0 +1,10 @@
+# ansible-role-redis/handlers/main.yml
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Restart Redis Service
+  ansible.builtin.systemd:
+    name: redis
+    state: restarted

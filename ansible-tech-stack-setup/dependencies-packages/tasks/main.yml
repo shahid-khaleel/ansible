@@ -1,0 +1,16 @@
+---
+- name: Installation of Dependent packages
+  ansible.builtin.apt:
+    pkg:
+      - java-common
+      - lsb-release
+      - curl
+      - gpg
+      - build-essential
+      - pkg-config
+      - libssl-dev
+      - make
+      - tcl
+      - mysql-client
+      - gnupg
+  when: install_deps_packages | default(true)
