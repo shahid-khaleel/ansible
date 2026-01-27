@@ -1,0 +1,26 @@
+stages:
+  - deploy
+
+variables:
+  ANSIBLE_HOST_KEY_CHECKING: "False"
+
+before_script:
+  #- id
+  - sudo apt-get update
+  - sudo apt-get install -y openssh-client sshpass
+  # Setup SSH
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+  - chmod 600 ~/.ssh/id_rsa
+  - ssh-keyscan -H 192.168.1.12 >> ~/.ssh/known_hosts
+
+deploy:
+  stage: deploy
+  script:
+    - ansible --version
+    - cd ansible-tech-stack-setup
+    - ansible-playbook -i ./hosts setup.yml
+  tags:
+    - docker
+
+  
