@@ -3,13 +3,14 @@
   gather_facts: true  # We don't need to gather facts for a simple ping
   become: true
   roles:
-    - apache2
-    - dependencies-packages
-    - java
-    - redis
-    - nodejs
-    - mysql-shell
-    - mongodb-shell
+    #- apache2
+    #- dependencies-packages
+    #- java
+    #- redis
+    #- nodejs
+    #- mysql-shell
+    #- mongodb-shell
+    - docker
   vars:
     correto_version: "21"
     redis_version: "7.4.1"
