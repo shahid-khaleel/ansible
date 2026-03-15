@@ -1,0 +1,81 @@
+# tasks file for apache2
+---
+- name: Ensure Keycloak directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /test/apps
+    - /test/keycloak-logs
+
+- name: Download Keycloak 25
+  ansible.builtin.get_url:
+    url: https://github.com/keycloak/keycloak/releases/download/25.0.0/keycloak-25.0.0.zip
+    dest: /test/apps/keycloak-25.0.0.zip
+    mode: '0644'
+
+- name: Unzip Keycloak
+  ansible.builtin.unarchive:
+    src: /test/apps/keycloak-25.0.0.zip
+    dest: /test/apps/
+    remote_src: yes
+
+- name: Rename extracted folder
+  ansible.builtin.command:
+    cmd: mv /test/apps/keycloak-25.0.0 /test/apps/keycloak
+    creates: /test/apps/keycloak
+
+- name: Remove Keycloak zip file
+  ansible.builtin.file:
+    path: /test/apps/keycloak-25.0.0.zip
+    state: absent
+
+- name: Create keycloak system user with no login
+  ansible.builtin.user:
+   name: keycloak
+   shell: /usr/sbin/nologin
+   system: yes
+   create_home: no
+
+- name: Backup keycloak.conf with current date
+  ansible.builtin.copy:
+    src: /test/apps/keycloak/conf/keycloak.conf
+    dest: "/test/apps/keycloak/conf/keycloak.conf.{{ ansible_date_time.date }}"
+    remote_src: yes
+    owner: keycloak
+    group: keycloak
+    mode: '0644'
+
+- name: Deploy Keycloak systemd service
+  ansible.builtin.template:
+    src: keycloak.service.j2
+    dest: /etc/systemd/system/keycloak.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart keycloak
+
+- name: Copy Keycloak conf file and set ownership
+  ansible.builtin.template:
+    src: keycloak.conf.j2
+    dest: /test/apps/keycloak/conf/keycloak.conf
+    owner: keycloak
+    group: keycloak
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart keycloak
+
+- name: Deploy Keycloak systemd service
+  ansible.builtin.template:
+    src: keycloak.service.j2
+    dest: /etc/systemd/system/keycloak.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart keycloak

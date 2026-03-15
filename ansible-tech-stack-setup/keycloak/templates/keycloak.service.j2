@@ -1,0 +1,30 @@
+[Unit]
+Description=The KEYCLOAK Quarkus
+After=syslog.target network.target
+Before=httpd.service
+
+[Service]
+User={{ keycloak_user }}
+Group={{ keycloak_group }}
+
+Environment="KEYCLOAK_ADMIN={{ keycloak_admin_user }}"
+Environment="KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}"
+
+WorkingDirectory={{ keycloak_home }}
+
+LimitNOFILE=1024
+
+PIDFile=/var/run/keycloak/keycloak.pid
+
+ExecStart={{ keycloak_home }}/bin/kc.sh --verbose start-dev \
+  --http-port {{ keycloak_http_port }} \
+  --log="file" \
+  --log-file="{{ keycloak_log_file }}" \
+  --proxy-headers=xforwarded \
+  --health-enabled=true \
+  --metrics-enabled=true
+
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target

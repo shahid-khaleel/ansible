@@ -1,0 +1,27 @@
+# Basic settings for running in production. Change accordingly before deploying the server.
+
+# Database
+db={{ keycloak_db_vendor }}
+
+# The username of the database user.
+db-username={{ keycloak_db_username }}
+
+# The password of the database user.
+db-password={{ keycloak_db_password }}
+
+# The full database JDBC URL.
+db-url={{ keycloak_db_url }}
+
+# Observability
+health-enabled=true
+metrics-enabled=true
+
+# HTTP
+#https-certificate-file=${kc.home.dir}conf/server.crt.pem
+#https-certificate-key-file=${kc.home.dir}conf/server.key.pem
+#proxy=reencrypt
+#spi-sticky-session-encoder-infinispan-should-attach-route=false
+
+# Hostname
+hostname={{ keycloak_hostname }}
+#hostname-path=/auth

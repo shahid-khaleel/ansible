@@ -1,0 +1,16 @@
+---
+# vars file for keycloak conf
+keycloak_db_vendor: mysql
+keycloak_db_username: keycloak
+keycloak_db_password: test@123
+keycloak_db_url: jdbc:mysql://localhost:3306/keycloak
+keycloak_hostname: https://iam-uat.test.in/
+
+# keycloak service configuration
+keycloak_user: keycloak
+keycloak_group: keycloak
+keycloak_home: /test/apps/keycloak
+keycloak_admin_user: admin
+keycloak_admin_password: test@123
+keycloak_http_port: 8080
+keycloak_log_file: /test/keycloak-logs/keycloak.log
